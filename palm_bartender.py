@@ -1,7 +1,4 @@
-#Authentication
-#gcloud auth application-default set-quota-project "cloud-llm-preview1"
-
-# # Utils
+# Utils
 import time
 from typing import List
 import streamlit as st
@@ -25,13 +22,13 @@ from langchain.chains.router.multi_prompt_prompt import MULTI_PROMPT_ROUTER_TEMP
 import vertexai
 from google.cloud import aiplatform
 
-#Image Generation
+# Image Generation
 import requests
 import google.auth
 import google.auth.transport.requests
 import json
 
-PROJECT_ID = "cloud-llm-preview1"
+PROJECT_ID = "your=project-id"
 vertexai.init(project=PROJECT_ID)
 
 llm = VertexAI(
