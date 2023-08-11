@@ -5,6 +5,7 @@
 import time
 from typing import List
 import streamlit as st
+from PIL import Image
 
 # Langchain
 import langchain
@@ -35,13 +36,13 @@ vertexai.init(project=PROJECT_ID)
 
 llm = VertexAI(
     model_name='text-bison',
-    temperature=0.9
+    temperature=0.6
 )
 
 order_template = """{chat_history} \
 You are a cocktail master. \ 
 You are great at suggesting the perfect cocktail for a customer order. \
-Answer the name of the cocktail only using couple of words.
+Answer in Markdown format the name of the cocktail in one line in title font and a separate line of description in smaller fonts.
 
 Here is a question:
 {input}"""
@@ -59,7 +60,7 @@ recipe_template = """{chat_history} \
 You are a cocktail master. \ 
 The customer will give you a list of ingredients they have and your job is to recommend a nice cocktail recipe using \
 only provided ingredients plus no more than one other key ingredient that's missing. \
-Provide the recipe in bullet points.
+Provide the name of the cocktail and recipe in bullet points.
 
 Here is a question:
 {input}"""
@@ -172,32 +173,39 @@ def get_images(prompt):
   return drink
 
 st.title('Your Personal PaLM Bartender')
-
+image = Image.open('palm_bartender.jpeg')
+st.image(image,width=700)
 
 st.session_state.input_text = ''    
 request=st.text_input("What would you like to order today?")
-if st.button("Confirm"):
+if st.button("Order"):
         if request:
-            if 'order' in request:
-                result = chain.run(request)
-                image = get_images(result)[0]['imageBase64']
-                order_html = f"""
-                <html>
-                <head>
-                    <title>AI Bartender</title>
-                </head>
-                <body>
-                    <div>
-                        <h1>{result}</h1>
-                        <img src="data:image/png;base64,{image}"/>
-                    </div>
-                </body>
-                </html>"""
+            result = chain.run(request)
+            image = get_images(result)[0]['imageBase64']
+            order_html = f"""
+            <html>
+            <head>
+                <title>AI Bartender</title>
+            </head>
+            <body>
+                <div>
+                    <h2>{result}</h2>
+                    <img src="data:image/png;base64,{image}"/>
+                </div>
+            </body>
+            </html>"""
 
-                from IPython import display
-                st.write(display.HTML(order_html))
-            else:
-                result = chain.run(request)
-                st.write(result)
+            from IPython import display
+            st.write(display.HTML(order_html))
+            st.write("Food Pairing Suggestions")
+            st.write(chain.run('What food do I pair with that'))
         else:
             st.warning("Please make your order.")
+
+st.session_state.input_text = ''    
+request=st.text_input("Want to make a drink out of your own cabinet?")
+if st.button("Suggest"):
+        if request:
+            st.write(chain.run(request))
+        else:
+            st.warning("Please list your question.")

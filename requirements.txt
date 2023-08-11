@@ -1,3 +1,4 @@
 google-cloud-aiplatform
 langchain
+streamlit
 IPython
